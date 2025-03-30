@@ -1,42 +1,25 @@
 # meinplugin/pyproject.toml
 
 [build-system]
-# Definiert, wie das Paket gebaut wird (Standard: setuptools)
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-# Hauptmetadaten deines Plugins
-name = "inventree-meinplugin"  # Name für PyPI/pip (Bindestriche sind ok)
-version = "0.1.0" # Deine Plugin-Version (kann auch dynamisch sein, s.u.)
-description = "Ein einfaches Beispielplugin für InvenTree, das einen Navigationslink hinzufügt."
-readme = "README.md" # Verweis auf deine Readme-Datei
-authors = [
-    { name = "Jan (Itsbasicjan)", email = "deine-email@example.com" }, # Passe das an!
-]
-license = { text = "MIT License" } # Wähle eine passende Lizenz oder ändere/entferne dies
-requires-python = ">=3.8" # Mindest-Python-Version (an InvenTree anpassen)
-classifiers = [ # Standardisierte Kategorien
-    "Development Status :: 3 - Alpha",
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License", # An deine Lizenz anpassen
-    "Operating System :: OS Independent",
-    "Framework :: Django",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-]
-# WICHTIG: Füge hier nur Abhängigkeiten hinzu, die dein Plugin *zusätzlich* zu
-# dem benötigt, was InvenTree/Django bereits bereitstellt.
-# dependencies = [
-#    "requests", # Beispiel: wenn du externe APIs aufrufst
-# ]
+# ... (alle deine bisherigen [project]-Einträge bleiben unverändert) ...
+name = "inventree-meinplugin"
+version = "0.1.0" # Oder dynamic = ["version"]
+# ... (description, authors, license, etc.) ...
 
 [project.urls]
-# Optionale Links
-Homepage = "https://github.com/Itsbasicjan/meinplugin"
-Repository = "https://github.com/Itsbasicjan/meinplugin"
+# ... (deine URLs bleiben unverändert) ...
 
-# Optional: Dynamische Version aus deiner version.py lesen
-# Wenn du das willst, ändere oben 'version = "0.1.0"' zu 'dynamic = ["version"]'
-# und füge diesen Block hinzu:
+# --- HIER DIE ÄNDERUNG / ERGÄNZUNG ---
+[tool.setuptools]
+# Sage setuptools explizit, welches Verzeichnis(se) die Pakete enthalten.
+# Der Name muss genau dem Verzeichnisnamen entsprechen, der __init__.py enthält.
+packages = ["inventree_meinplugin"]
+
+# Falls du dynamische Versionierung verwendest, sieht dieser Abschnitt evtl. so aus:
 # [tool.setuptools.dynamic]
 # version = {attr = "inventree_meinplugin.version.PLUGIN_VERSION"}
+# --- Ende der Änderung / Ergänzung ---
