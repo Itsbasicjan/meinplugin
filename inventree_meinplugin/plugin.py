@@ -3,6 +3,7 @@
 Einfaches Plugin mit Navigation und Panel für Lagerorte (Stock Locations).
 Stellt sicher, dass normale Leerzeichen für die Einrückung verwendet werden!
 """
+
 from plugin import InvenTreePlugin
 from plugin.mixins import NavigationMixin, PanelMixin, UrlsMixin
 # View für Lagerort-Details importieren
