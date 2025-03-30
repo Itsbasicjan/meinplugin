@@ -3,14 +3,14 @@
 Haupt-Plugin-Klasse für MeinPlugin.
 """
 
-from plugin import InvenTreePlugin
+from inventree_meinplugin.plugin import InvenTreePlugin
 from plugin.mixins import NavigationMixin, UrlsMixin # Mixins für Navigationsleiste und URLs
 from django.urls import path, include
 
 # Importiere die Version aus der version.py
 from .version import PLUGIN_VERSION
 # Importiere die Views, die wir später definieren
-from . import views
+from .inventree_meinplugin import views
 
 class MeinPlugin(NavigationMixin, UrlsMixin, InvenTreePlugin): # Erbt von Mixins und Basisklasse
     """

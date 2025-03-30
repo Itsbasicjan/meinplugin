@@ -4,7 +4,7 @@ Plugin Paket für MeinPlugin.
 """
 
 # Importiere die Plugin-Klasse, damit sie von InvenTree entdeckt wird
-from .plugin import MeinPlugin
+from .inventree_meinplugin.plugin import MeinPlugin
 
 # Optional: Definiere Metadaten für das Paket
 __version__ = "0.1.0"
