@@ -1,59 +1,87 @@
 # inventree_meinplugin/plugin.py
 """
-Haupt-Plugin-Klasse für MeinPlugin.
+Haupt-Plugin-Klasse für MeinPlugin mit Navigation und Panel.
 """
 
-from inventree_meinplugin.plugin import InvenTreePlugin
-from plugin.mixins import NavigationMixin, UrlsMixin # Mixins für Navigationsleiste und URLs
-from django.urls import path, include
-
-# Importiere die Version aus der version.py
+from plugin import InvenTreePlugin
+# Benötigte Mixins importieren
+from plugin.mixins import NavigationMixin, PanelMixin, UrlsMixin
+# Die Ansicht importieren, zu der wir ein Panel hinzufügen wollen (z.B. Teiledetails)
+from part.views import PartDetail
+from django.urls import path
 from .version import PLUGIN_VERSION
-# Importiere die Views, die wir später definieren
-from .inventree_meinplugin import views
+from . import views # Import für unsere eigene Plugin-Seite
 
-class MeinPlugin(NavigationMixin, UrlsMixin, InvenTreePlugin): # Erbt von Mixins und Basisklasse
+# PanelMixin zur Vererbung hinzufügen
+class MeinPlugin(PanelMixin, NavigationMixin, UrlsMixin, InvenTreePlugin):
     """
-    Ein einfaches Beispiel-Plugin für InvenTree.
-    Fügt einen Eintrag zur Navigationsleiste hinzu.
+    Ein Beispielplugin mit Navigationslink (via Konstante) und Panel.
     """
 
-    # Metadaten des Plugins
-    NAME = "MeinPlugin"  # Interner Name
-    SLUG = "meinplugin"  # Eindeutiger Slug (wird in URLs, etc. verwendet) - nur Kleinbuchstaben/Zahlen/-/_
-    TITLE = "Mein Cooles Plugin" # Angezeigter Titel
-    DESCRIPTION = "Ein einfaches Beispielplugin, das einen Navigationslink hinzufügt."
+    # --- Metadaten ---
+    NAME = "MeinPlugin"
+    SLUG = "meinplugin"
+    TITLE = "Mein Cooles Plugin"
+    DESCRIPTION = "Ein Beispielplugin mit Navigationslink und Panel." # Beschreibung aktualisiert
     VERSION = PLUGIN_VERSION
     AUTHOR = "Jan Schüler"
 
-    # Definiert den Eintrag in der Navigationsleiste
-    def setup_navbar_entries(self):
-        """
-        Gibt eine Liste von Navigationsleisten-Einträgen zurück.
-        Jeder Eintrag ist ein Dictionary.
-        """
-        return {
-            # Eindeutiger Schlüssel für diesen Eintrag
-            'meinplugin_index': {
-                'name': 'Mein Plugin',  # Text, der in der Navigationsleiste angezeigt wird
-                'link': 'plugin:meinplugin:index', # URL-Name (Plugin-Slug:URL-Name aus setup_plugin_urls)
-                'icon': 'fas fa-plug', # Optional: FontAwesome Icon-Klasse (stelle sicher, dass FA geladen ist)
-            }
-        }
+    # --- Navigation via Konstante ---
+    # Explizit die Navigation für dieses Plugin aktivieren (gute Praxis)
+    NAVIGATION_ENABLED = True
+    # Definiere die Navigationslinks als Liste von Dictionaries
+    NAVIGATION = [
+        {
+            'name': 'Coole Plugin Seite', # Name leicht geändert zum Testen
+            'link': 'plugin:meinplugin:index', # Muss mit URL 'name' übereinstimmen
+            'icon': 'fas fa-star', # Anderes Icon zum Testen
+        },
+        # Hier könnten weitere Links für dieses Plugin stehen
+        # {'name': 'Zweiter Link', 'link': 'plugin:meinplugin:other', 'icon': '...'},
+    ]
+    # Optional: Ein gemeinsamer Reiter für die Links dieses Plugins
+    # NAVIGATION_TAB_NAME = "Meine Tools"
+    # NAVIGATION_TAB_ICON = 'fas fa-tools'
 
-    # Definiert die URL-Routen für dieses Plugin
+
+    # --- Panel Implementation ---
+    # Diese Methode wird von InvenTree aufgerufen, um Panels für die aktuelle Ansicht zu erhalten
+    def get_custom_panels(self, view, request):
+        panels = [] # Eine Liste, da man mehrere Panels hinzufügen könnte
+
+        # Prüfen: Sind wir auf der Detailansicht eines Teils (PartDetail)?
+        if isinstance(view, PartDetail):
+            # Ja! Holen wir uns das spezifische Teil-Objekt, das gerade angezeigt wird
+            part = view.get_object()
+
+            # Erstelle die Definition für unser Panel
+            panels.append({
+                'title': 'Mein Teil-Panel', # Titel des Panels
+                'icon': 'fas fa-info-circle', # Icon für das Panel
+                # --- Inhalt Option 1: Direkter HTML-Code ---
+                'content': f'<h3>Panel von MeinPlugin</h3><p>Dieses Panel wird für das Teil <strong>{part.name}</strong> (PK: {part.pk}) angezeigt.</p><hr><p>Hier könnte spezifische Info oder Aktionen für dieses Teil stehen.</p>',
+
+                # --- Inhalt Option 2: Template verwenden (besser für komplexere Inhalte) ---
+                # 'content_template': 'meinplugin/mein_panel_inhalt.html', # Pfad zur Template-Datei
+                # 'context': { # Daten, die an das Template übergeben werden sollen
+                #     'anzeige_teil': part,
+                #     'plugin_version': self.VERSION
+                # }
+            })
+
+        # Hier könnte man auf andere Views prüfen:
+        # elif isinstance(view, PurchaseOrderDetail):
+        #     panels.append({...}) # Panel für Bestell-Details
+
+        return panels # Gib die Liste der Panels für diese Ansicht zurück
+
+
+    # --- URLs für die eigene Plugin-Seite ---
+    # Diese Methode definiert die URL für die Seite, auf die der Navigationslink zeigt
     def setup_plugin_urls(self):
-        """
-        Gibt eine Liste von URL-Mustern für dieses Plugin zurück.
-        Diese werden unter dem Namespace des Plugin-Slugs gemountet.
-        z.B. /plugin/meinplugin/
-        """
         return [
-            # Pfad für die Hauptseite des Plugins
-            # '' bedeutet die Basis-URL des Plugins (/plugin/meinplugin/)
-            # views.mein_plugin_view ist die Funktion in views.py, die aufgerufen wird
-            # name='index' ist der Name dieser URL, verwendet im 'link' oben
             path('', views.mein_plugin_view, name='index'),
-            # Hier könntest du weitere URLs für dein Plugin hinzufügen
-            # path('andere-seite/', views.andere_ansicht, name='andere_seite'),
+            # path('other/', views.andere_ansicht, name='other'), # Falls zweiter Nav-Link genutzt wird
         ]
+
+    # Die Methode setup_navbar_entries wird nicht mehr benötigt, wenn NAVIGATION verwendet wird!
