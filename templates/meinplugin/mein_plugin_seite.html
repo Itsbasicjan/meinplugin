@@ -1,0 +1,20 @@
+{% extends "base.html" %} {% load i18n %} {% load inventree_extras %} {% block page_title %}
+{% trans page_title %} | {% trans "Mein Plugin" %}
+{% endblock page_title %}
+
+{% block content %}
+<div class="container-fluid"> <div class="row">
+        <div class="col-12">
+            <h1>{% trans page_title %}</h1> {# Benutzt die Variable aus dem View-Kontext #}
+            <hr> {# Horizontale Linie #}
+
+            <p>{{ message }}</p> {# Benutzt die Variable aus dem View-Kontext #}
+
+            <p>{% trans "Dies ist der Inhalt, der von meinem benutzerdefinierten InvenTree-Plugin bereitgestellt wird." %}</p>
+
+            <a href="{% url 'index' %}" class="btn btn-secondary">{% trans "Zurück zum Dashboard" %}</a>
+
+        </div>
+    </div>
+</div>
+{% endblock content %}
